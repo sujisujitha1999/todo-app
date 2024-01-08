@@ -153,7 +153,7 @@ class AddItemScreen extends GetView<AddItemController> {
               onTap: () async {
                 controller.selectedDate.value = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
+                        initialDate: controller.selectedDate.value,
                         firstDate: DateTime(2023, 01, 01),
                         lastDate: DateTime(2050, 01, 01)) ??
                     controller.selectedDate.value;
