@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/constant.dart';
+import 'package:todo_app/firebase/firebase_database.dart';
 import 'package:todo_app/utils.dart';
 
-import '../add_item/add_item_view.dart';
-import '../main.dart';
 import 'components/todo_card.dart';
 
 class TodoListView extends StatelessWidget {
@@ -107,16 +106,9 @@ class TodoListView extends StatelessWidget {
           width: w * .18,
           child: FloatingActionButton(
               backgroundColor: violet,
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return AddItemScreen(
-                      h: h,
-                      w: w,
-                    );
-                  },
-                );
+              onPressed: () async {
+                FirebaseDatabase firebase = FirebaseDatabase();
+                Map? todoList = await firebase.readData();
               },
               child: Text(
                 String.fromCharCode(CupertinoIcons.add.codePoint),
