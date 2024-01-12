@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
+Logger log = Logger();
 String getWeekDay(DateTime day) {
   return DateFormat.E().format(day);
 }
