@@ -1,10 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todo_app/add_item/add_item_controller.dart';
-import 'package:todo_app/todo_list/todo_list_view.dart';
 
 import 'firebase_options.dart';
+import 'pages/add_item/add_item_controller.dart';
+import 'pages/splash/splash_screen.dart';
+import 'pages/todo_list/todo_list_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +13,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Get.put(AddItemController());
+  Get.put(TodoListController());
   runApp(const MyApp());
 }
 
@@ -20,9 +22,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: TodoListView(),
+      home: SplashView(),
     );
   }
 }
