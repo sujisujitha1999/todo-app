@@ -8,8 +8,8 @@ import 'package:todo_app/utils.dart';
 import '../add_item/add_item_view.dart';
 import 'components/todo_card.dart';
 
-class TodoListView extends GetView<TodoListController> {
-  TodoListView({super.key});
+class HomeView extends GetView<TodoListController> {
+  HomeView({super.key});
   final DateTime today = DateTime.now();
   // Map? data = Get.arguments;
   @override
@@ -54,7 +54,7 @@ class TodoListView extends GetView<TodoListController> {
                   ),
                   SizedBox(
                     width: w * .9,
-                    child: TodoContainer(h: h, today: today, w: w * .9),
+                    child: TodoListContainer(h: h, today: today, w: w * .9),
                   )
                 ],
               );

@@ -14,7 +14,7 @@ class SplashView extends StatelessWidget {
     Future.delayed(const Duration(seconds: 3), () async {
       Get.find<TodoListController>().getTodos();
       Get.offAll(
-        () => TodoListView(),
+        () => HomeView(),
       );
     });
     double width = MediaQuery.of(context).size.width;
