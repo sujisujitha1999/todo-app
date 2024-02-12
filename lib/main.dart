@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todo_app/pages/login/login_controller.dart';
 
 import 'firebase_options.dart';
 import 'pages/add_item/add_item_controller.dart';
@@ -14,6 +15,7 @@ void main() async {
   );
   Get.put(AddItemController());
   Get.put(TodoListController());
+  Get.put(LoginController());
   runApp(const MyApp());
 }
 
