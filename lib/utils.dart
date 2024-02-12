@@ -104,3 +104,23 @@ showWarning(String title, String msg) {
       backgroundColor: Colors.amber.shade50,
       colorText: Colors.orange);
 }
+
+List<BoxShadow> getBoxShadow() {
+  return const [
+    BoxShadow(
+      color: Colors.black38,
+      offset: Offset(
+        0,
+        4,
+      ),
+      blurRadius: 10,
+      spreadRadius: 1.0,
+    ),
+    BoxShadow(
+      color: Colors.white,
+      offset: Offset(0.0, 0.0),
+      blurRadius: 0.0,
+      spreadRadius: 0.0,
+    ),
+  ];
+}

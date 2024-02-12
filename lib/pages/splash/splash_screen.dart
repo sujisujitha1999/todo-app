@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/constant.dart';
+import 'package:todo_app/pages/login/login_controller.dart';
 import 'package:todo_app/utils.dart' as u;
-
-import '../todo_list/todo_list_controller.dart';
-import '../todo_list/todo_list_view.dart';
 
 class SplashView extends StatelessWidget {
   const SplashView({super.key});
@@ -12,10 +10,7 @@ class SplashView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 3), () async {
-      Get.find<TodoListController>().getTodos();
-      Get.offAll(
-        () => HomeView(),
-      );
+      Get.find<LoginController>().checkUserLoggedInOrNot();
     });
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
