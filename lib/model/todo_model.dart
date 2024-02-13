@@ -38,8 +38,8 @@ class TodoModel {
   }
 
   factory TodoModel.fromSnapshot(
-      DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
-    final data = documentSnapshot.data()!;
+      QueryDocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
+    final data = documentSnapshot.data();
     return TodoModel(
         id: data["id"],
         dateTime: data["dateTime"],

@@ -2,27 +2,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_app/model/todo_model.dart';
 import 'package:todo_app/utils.dart' as u;
+import 'package:todo_app/globals.dart' as g;
 
 class FirebaseDatabase {
   FirebaseFirestore database = FirebaseFirestore.instance;
 
-  Future<List<TodoModel>> readData() async {
-    final collectionReference =
-        await database.collection("sujisujitha1999@gmail.com").get();
-    List<TodoModel> list =
-        collectionReference.docs.map((e) => TodoModel.fromSnapshot(e)).toList();
-    return list;
+  Future<List<TodoModel>> readData(
+      String searchFromRange, String searchToRange) async {
+    print(searchFromRange);
+    print(searchToRange);
+    QuerySnapshot<Map<String, dynamic>> collectionReference = await database
+        .collection(g.userMail)
+        .where(
+          FieldPath.documentId,
+          isGreaterThanOrEqualTo: searchFromRange,
+        )
+        .where(FieldPath.documentId, isLessThan: searchToRange)
+        .get();
+
+    return collectionReference.docs
+        .map((e) => TodoModel.fromSnapshot(e))
+        .toList();
   }
 
-  storeData(TodoModel data, String id) async {
-    CollectionReference reference =
-        database.collection("sujisujitha1999@gmail.com");
-    await reference
-        .add(data.toJson())
-        .whenComplete(
-            () => u.showWarning("Success", "Successfully added your todo."))
-        .catchError((error, stackTrace) {
-      u.showWarning("Error", "Something went wrong. Try again");
+  Future storeData(TodoModel data, String id) async {
+    await database
+        .collection(g.userMail)
+        .doc(id)
+        .set(data.toJson())
+        .whenComplete(() {
+      u.showWarning("Success", "Successfully added your todo");
+      return null;
+    }).catchError((error, sta) {
+      u.showWarning("Error", "Something went wrong. Try again later.");
+      return error;
     });
   }
 }

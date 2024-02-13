@@ -11,17 +11,20 @@ class AddItemController extends GetxController {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  storeDataToDb() {
-    // Map<String, dynamic> data = {};
+  storeDataToDb() async {
     TodoModel tooData = TodoModel.fromJson({});
-    // tooData.dateTime= DateTime.now().toString();
     tooData.type = isSelectedTodo.value == true ? "todo" : "routine";
     tooData.title = titleController.text;
     tooData.description = descriptionController.text;
     tooData.dateTime = selectedDate.value.toString();
     tooData.priority = goingToMakePriority.value;
 
-    dynamic response = FirebaseDatabase().storeData(tooData, "123456789");
+    dynamic response = await FirebaseDatabase().storeData(
+        tooData,
+        DateTime(selectedDate.value.year, selectedDate.value.month,
+                selectedDate.value.day)
+            .millisecondsSinceEpoch
+            .toString());
     print(response);
     if (response == null) {
       clearData();

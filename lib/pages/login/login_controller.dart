@@ -6,6 +6,7 @@ import 'package:todo_app/pages/login/login_view.dart';
 import 'package:todo_app/pages/todo_list/todo_list_controller.dart';
 import 'package:todo_app/pages/todo_list/todo_list_view.dart';
 import 'package:todo_app/utils.dart' as u;
+import 'package:todo_app/globals.dart' as g;
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -42,7 +43,10 @@ class LoginController extends GetxController {
       if (user == null) {
         Get.offAll(() => LoginView());
       } else {
-        Get.find<TodoListController>().getTodos();
+        g.userMail = user.email!;
+        final todoController = Get.find<TodoListController>();
+        todoController.searchByToday();
+        todoController.getTodos();
         Get.offAll(() => HomeView());
       }
     });
