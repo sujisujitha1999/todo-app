@@ -9,8 +9,6 @@ class FirebaseDatabase {
 
   Future<List<TodoModel>> readData(
       String searchFromRange, String searchToRange) async {
-    print(searchFromRange);
-    print(searchToRange);
     QuerySnapshot<Map<String, dynamic>> collectionReference = await database
         .collection(g.userMail)
         .where(
@@ -31,7 +29,6 @@ class FirebaseDatabase {
         .doc(id)
         .set(data.toJson())
         .whenComplete(() {
-      u.showWarning("Success", "Successfully added your todo");
       return null;
     }).catchError((error, sta) {
       u.showWarning("Error", "Something went wrong. Try again later.");

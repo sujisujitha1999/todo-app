@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/firebase/firebase_database.dart';
 import 'package:todo_app/model/todo_model.dart';
+import 'package:todo_app/pages/add_item/widgets/success_popup.dart';
+import 'package:todo_app/pages/todo_list/todo_list_controller.dart';
 import 'package:todo_app/utils.dart' as u;
 
 class AddItemController extends GetxController {
@@ -12,22 +14,31 @@ class AddItemController extends GetxController {
   TextEditingController descriptionController = TextEditingController();
 
   storeDataToDb() async {
-    TodoModel tooData = TodoModel.fromJson({});
-    tooData.type = isSelectedTodo.value == true ? "todo" : "routine";
-    tooData.title = titleController.text;
-    tooData.description = descriptionController.text;
-    tooData.dateTime = selectedDate.value.toString();
-    tooData.priority = goingToMakePriority.value;
+    TodoModel todoData = TodoModel.fromJson({});
 
-    dynamic response = await FirebaseDatabase().storeData(
-        tooData,
-        DateTime(selectedDate.value.year, selectedDate.value.month,
-                selectedDate.value.day)
-            .millisecondsSinceEpoch
-            .toString());
-    print(response);
+    String uniqueId = DateTime(
+            selectedDate.value.year,
+            selectedDate.value.month,
+            selectedDate.value.day,
+            DateTime.now().hour,
+            DateTime.now().minute,
+            DateTime.now().second,
+            DateTime.now().millisecond)
+        .millisecondsSinceEpoch
+        .toString();
+    todoData.type = isSelectedTodo.value == true ? "todo" : "routine";
+    todoData.title = titleController.text;
+    todoData.description = descriptionController.text;
+    todoData.dateTime = selectedDate.value.toString();
+    todoData.priority = goingToMakePriority.value;
+    todoData.id = uniqueId;
+    dynamic response = await FirebaseDatabase().storeData(todoData, uniqueId);
     if (response == null) {
       clearData();
+
+      Get.find<TodoListController>().searchByToday();
+      Get.find<TodoListController>().getTodos();
+      showSuccessPopup();
     }
   }
 
