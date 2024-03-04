@@ -29,9 +29,11 @@ class HomeView extends GetView<TodoListController> {
             child: Column(
               children: [
                 u.vFill(h * .02),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: w * .02),
-                  child: TimeAndCalendarHeader(h: h, today: today),
+                SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: w * .02),
+                    child: TimeAndCalendarHeader(h: h, today: today),
+                  ),
                 ),
               ],
             ),

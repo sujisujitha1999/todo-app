@@ -43,7 +43,8 @@ class AddItemScreen extends GetView<AddItemController> {
                       height: h * .08,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(7),
-                          border: Border.all(color: Colors.grey.shade300)),
+                          border:
+                              Border.all(color: Colors.blue.withOpacity(0.2))),
                       width: w * .9,
                     ),
                     Obx(
@@ -58,7 +59,8 @@ class AddItemScreen extends GetView<AddItemController> {
                               decoration: controller.isSelectedTodo.value
                                   ? BoxDecoration(
                                       border: Border.all(
-                                          color: Colors.black, width: 1),
+                                          color: violet.withOpacity(0.7),
+                                          width: 1),
                                       borderRadius: BorderRadius.circular(7),
                                     )
                                   : null,
@@ -93,7 +95,8 @@ class AddItemScreen extends GetView<AddItemController> {
                               decoration: !controller.isSelectedTodo.value
                                   ? BoxDecoration(
                                       border: Border.all(
-                                          color: Colors.black, width: 1),
+                                          color: violet.withOpacity(0.7),
+                                          width: 1),
                                       borderRadius: BorderRadius.circular(7),
                                     )
                                   : null,
@@ -131,7 +134,7 @@ class AddItemScreen extends GetView<AddItemController> {
                   controller: controller.titleController,
                   decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.grey.shade200,
+                      fillColor: Colors.blue.withOpacity(0.1),
                       focusedBorder:
                           const OutlineInputBorder(borderSide: BorderSide.none),
                       enabledBorder: const OutlineInputBorder(
@@ -144,7 +147,8 @@ class AddItemScreen extends GetView<AddItemController> {
                   maxLines: 5,
                   decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.grey.shade200,
+                      // fillColor: Colors.grey.shade200,
+                      fillColor: Colors.blue.withOpacity(0.1),
                       focusedBorder:
                           const OutlineInputBorder(borderSide: BorderSide.none),
                       enabledBorder: const OutlineInputBorder(

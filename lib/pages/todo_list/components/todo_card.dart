@@ -62,7 +62,10 @@ class TodoListContainer extends GetView<TodoListController> {
               height: h * .72,
               child: GetBuilder<TodoListController>(builder: (cont) {
                 return controller.isGettingTodos.value
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: CircularProgressIndicator(
+                        color: violet,
+                      ))
                     : TodoList(
                         controller: controller,
                         w: w,

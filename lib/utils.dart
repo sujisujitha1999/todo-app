@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:todo_app/constant.dart';
 
 Logger log = Logger();
 String getWeekDay(DateTime day) {
@@ -67,15 +68,14 @@ showLoading(message) {
       child: Center(
         child: SizedBox(
           width: 300,
-          // height: 100,
           child: Material(
             type: MaterialType.transparency,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CircularProgressIndicator(
+                CircularProgressIndicator(
                   strokeWidth: 5,
-                  // valueColor: AlwaysStoppedAnimation<Color>(),
+                  color: violet,
                 ),
                 vFill(10),
                 Text('$message...',

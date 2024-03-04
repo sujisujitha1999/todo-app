@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 // Color violet = Color(0xff45376a);
 Color violet = Color(0xff152a45);
 Color violetLight = Color.fromARGB(255, 65, 102, 150);
-// Color todoColor = Color(0xff97b7c0);
-// Color routinecolor = Color(0xffef9191);
+Color todoColor = Color(0xff97b7c0);
+Color routinecolor = Color(0xffef9191);
 // Color backgroundColor = Color(0xffddd0c8);
 // Color pink = Color(0xfffdccc7);
 
