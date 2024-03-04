@@ -32,6 +32,7 @@ class AddItemController extends GetxController {
     todoData.dateTime = selectedDate.value.toString();
     todoData.priority = goingToMakePriority.value;
     todoData.id = uniqueId;
+    todoData.status = false;
     dynamic response = await FirebaseDatabase().storeData(todoData, uniqueId);
     if (response == null) {
       clearData();

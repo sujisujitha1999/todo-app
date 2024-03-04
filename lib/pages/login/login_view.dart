@@ -24,7 +24,11 @@ class LoginView extends GetView<LoginController> {
                 Container(
                   width: width,
                   height: height * .45,
-                  color: violet,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                    violetLight,
+                    violet,
+                  ], begin: Alignment.topLeft, end: Alignment.bottomRight)),
                 ),
                 Container(
                   color: Colors.white,
@@ -132,6 +136,7 @@ class LoginView extends GetView<LoginController> {
                   ),
                   u.vFill(height * .03),
                   TextFormField(
+                    style: GoogleFonts.dmSans(),
                     controller: controller.emailController,
                     decoration: InputDecoration(
                         // focusColor: violet,
@@ -163,16 +168,31 @@ class LoginView extends GetView<LoginController> {
                   u.vFill(height * .05),
                   SizedBox(
                     width: width * .6,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: violet,
-                            padding: const EdgeInsets.symmetric(vertical: 20)),
-                        onPressed: () {
-                          controller.onLogin();
-                        },
-                        child: const u.TextWithDmSans(
-                          text: "Login",
-                        )),
+                    child: Center(
+                      child: InkWell(
+                        onTap: () => controller.onLogin(),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              gradient: LinearGradient(
+                                  colors: [
+                                    violetLight,
+                                    violet,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight)),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: const Center(
+                            child: u.TextWithDmSans(
+                              text: "Login",
+                              color: Colors.white,
+                              weight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   )
                 ],
               ),

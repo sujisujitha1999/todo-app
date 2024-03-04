@@ -35,4 +35,19 @@ class FirebaseDatabase {
       return error;
     });
   }
+
+  Future updateData(
+    TodoModel data,
+  ) async {
+    await database
+        .collection(g.userMail)
+        .doc(data.id)
+        .set(data.toJson())
+        .whenComplete(() {
+      return null;
+    }).catchError((error, sta) {
+      u.showWarning("Error", "Something went wrong. Try again later.");
+      return error;
+    });
+  }
 }

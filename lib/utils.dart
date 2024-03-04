@@ -19,21 +19,27 @@ String getFullDate(DateTime day) {
 
 class TextWithDmSans extends StatelessWidget {
   const TextWithDmSans(
-      {super.key, required this.text, this.color, this.weight, this.fontSize});
+      {super.key,
+      required this.text,
+      this.color,
+      this.weight,
+      this.fontSize,
+      this.decoration});
   final String text;
   final Color? color;
   final FontWeight? weight;
   final double? fontSize;
+  final TextDecoration? decoration;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       style: GoogleFonts.dmSans(
-        color: color,
-        fontSize: fontSize,
-        fontWeight: weight,
-      ),
+          color: color,
+          fontSize: fontSize,
+          fontWeight: weight,
+          decoration: decoration),
     );
   }
 }
