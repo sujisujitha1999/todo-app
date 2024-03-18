@@ -1,16 +1,17 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:todo_app/constant.dart';
 import 'package:todo_app/pages/todo_list/todo_list_controller.dart';
 import 'package:todo_app/utils.dart';
-
-import '../add_item/add_item_view.dart';
+import 'components/floating_button.dart';
+import 'components/time_with_calendar_header.dart';
 import 'components/todo_card.dart';
 import 'package:todo_app/utils.dart' as u;
 
-class HomeView extends GetView<TodoListController> {
-  HomeView({super.key});
+class TodoListView extends GetView<TodoListController> {
+  TodoListView({super.key});
   final DateTime today = DateTime.now();
   // Map? data = Get.arguments;
   @override
@@ -20,59 +21,146 @@ class HomeView extends GetView<TodoListController> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: w * .02),
-            height: h,
-            width: w,
-            decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [violetLight, violet])),
-            child: Column(
-              children: [
-                u.vFill(h * .02),
-                SafeArea(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: w * .02),
-                    child: TimeAndCalendarHeader(h: h, today: today),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          BgContainer(w: w, h: h, today: today),
           Positioned(
               right: 0,
               left: 0,
               bottom: 0,
-              child: TodoListContainer(h: h, today: today, w: w))
+              child: Obx(() => TodoListContainer(
+                  h: controller.isCalendarOpened.value ? h * .2 : h * .87,
+                  today: today,
+                  w: w)))
         ],
-      )
-
-      /* GetBuilder<TodoListController>(builder: (cont) {
-        return controller.isGettingTodos.value
-            ? const Center(child: CircularProgressIndicator())
-            : TodoListContainer(h: h, today: today, w: w);
-      }),*/
-      ,
-      floatingActionButton: SizedBox(
-          height: h * .15,
-          width: w * .18,
-          child: FloatingActionButton(
-              backgroundColor: violet,
-              onPressed: () async {
-                Get.to(() => AddItemScreen(
-                      w: w,
-                      h: h,
-                    ));
-              },
-              child: Text(
-                String.fromCharCode(CupertinoIcons.add.codePoint),
-                style: TextStyle(
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.w100,
-                    fontFamily: CupertinoIcons.add.fontFamily,
-                    package: CupertinoIcons.add.fontPackage),
-              ))),
+      ),
+      floatingActionButton: FloatingWidget(h: h, w: w),
     );
   }
+}
+
+class BgContainer extends GetView<TodoListController> {
+  const BgContainer({
+    super.key,
+    required this.w,
+    required this.h,
+    required this.today,
+  });
+
+  final double w;
+  final double h;
+  final DateTime today;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: w * .02),
+      height: h,
+      width: w,
+      decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [violetLight, violet])),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: w * .02),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            u.vFill(h * .02),
+            SafeArea(
+              child: TimeAndCalendarHeader(h: h, today: today),
+            ),
+            u.vFill(h * .04),
+            GetBuilder<TodoListController>(builder: (cont) {
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              controller.closeCalendar();
+                            },
+                            icon: const Icon(
+                              Icons.close,
+                            ))
+                      ],
+                    ),
+                    TableCalendar(
+                      focusedDay: controller.selectedDate.value,
+                      firstDay: DateTime(2024, 03, 04),
+                      lastDay: DateTime.now().add(
+                        const Duration(days: 100),
+                      ),
+                      selectedDayPredicate: (day) {
+                        return isSameDay(day, controller.selectedDate.value);
+                      },
+                      onDaySelected: (selectedDay, focusedDay) {
+                        controller.selectDate(selectedDay);
+                      },
+                      daysOfWeekStyle: const DaysOfWeekStyle(
+                        decoration: BoxDecoration(),
+                      ),
+                      headerStyle: HeaderStyle(
+                          formatButtonVisible: false,
+                          titleCentered: true,
+                          titleTextStyle: GoogleFonts.dmSans(
+                              color: violet, fontWeight: FontWeight.w600)),
+                      calendarStyle: const CalendarStyle(
+                        outsideDaysVisible: false,
+                      ),
+                      calendarBuilders: CalendarBuilders(
+                        defaultBuilder: (context, day, focusedDay) {
+                          return calenderDaysBox(day);
+                        },
+                        selectedBuilder: (context, day, focusedDay) =>
+                            calenderDaysBox(day,
+                                gradient: LinearGradient(
+                                    colors: [violetLight, violet]),
+                                dayColor: Colors.white,
+                                weight: FontWeight.w600),
+                        todayBuilder: (context, day, focusedDay) =>
+                            calenderDaysBox(day,
+                                border: Border.all(color: violet, width: 1.3),
+                                dayColor: violet,
+                                weight: FontWeight.w600),
+                        outsideBuilder: (context, day, focusedDay) =>
+                            const SizedBox(),
+                        disabledBuilder: (context, day, focusedDay) =>
+                            calenderDaysBox(day, dayColor: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            })
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+calenderDaysBox(DateTime day,
+    {LinearGradient? gradient,
+    Color dayColor = Colors.black,
+    FontWeight weight = FontWeight.w400,
+    BoxBorder? border}) {
+  return Container(
+    decoration: BoxDecoration(
+        shape: BoxShape.circle, gradient: gradient, border: border),
+    height: 40,
+    width: 40,
+    child: Center(
+        child: u.TextWithDmSans(
+      text: day.day.toString(),
+      color: dayColor,
+      weight: weight,
+    )),
+  );
 }
 
 class SideButton extends StatelessWidget {
@@ -112,36 +200,6 @@ class SideButton extends StatelessWidget {
     );
   }
 }
-
-/* Container(
-                    color: violet,
-                    width: w * .1,
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          vFill(h * .02),
-                          SideButton(
-                            h: h,
-                            text: "ALL",
-                            textColor: violet,
-                            backgroundColor: Colors.white,
-                          ),
-                          vFill(4),
-                          SideButton(
-                              h: h,
-                              text: "Todo",
-                              textColor: violet,
-                              backgroundColor: todoColor),
-                          vFill(4),
-                          SideButton(
-                              h: h,
-                              text: "Routine",
-                              textColor: violet,
-                              backgroundColor: routinecolor)
-                        ],
-                      ),
-                    ),
-                  ),*/
 
 bgWhiteContainer(Widget child) {
   return Container(

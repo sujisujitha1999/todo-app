@@ -8,11 +8,34 @@ import '../../firebase/firebase_database.dart';
 import 'package:todo_app/utils.dart' as u;
 
 class TodoListController extends GetxController {
+  var isCalendarOpened = false.obs;
   var isGettingTodos = false.obs;
   RxInt selectedTodo = RxInt(-1);
   var todoList = <TodoModel>[].obs;
+  var selectedDate = DateTime.now().obs;
   String searchFromRange = "";
   String searchToRange = "";
+
+  void openTheCalendar() {
+    isCalendarOpened.value = true;
+    // isCalendarOpened.value = !isCalendarOpened.value;
+    update();
+  }
+
+  void closeCalendar() {
+    isCalendarOpened.value = false;
+    // isCalendarOpened.value = !isCalendarOpened.value;
+    update();
+  }
+
+  selectDate(DateTime date) {
+    selectedDate.value = date;
+    searchByAnyDay(selectedDate.value, selectedDate.value);
+    update();
+    getTodos();
+    isCalendarOpened.value = false;
+    update();
+  }
 
   searchByToday() {
     DateTime today = DateTime.now();

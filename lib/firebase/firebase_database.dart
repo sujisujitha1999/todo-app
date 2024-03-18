@@ -50,4 +50,18 @@ class FirebaseDatabase {
       return error;
     });
   }
+
+  storeCollaborator(Map<String, dynamic> data, String collaboratorEmail,
+      {Function()? onSuccess, Function(dynamic)? onError}) async {
+    await database
+        .collection(g.userMail)
+        .doc(collaboratorEmail)
+        .set(data)
+        .whenComplete(() {
+      onSuccess!();
+    }).catchError((error, _) {
+      u.showWarning("Error", "Something went wrong. Try again later.");
+      onError!(error);
+    });
+  }
 }

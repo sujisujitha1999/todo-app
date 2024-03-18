@@ -1,1 +1,2 @@
 String userMail = "";
+List collabUsers = [];

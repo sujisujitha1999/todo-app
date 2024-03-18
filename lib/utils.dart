@@ -25,12 +25,14 @@ class TextWithDmSans extends StatelessWidget {
       this.color,
       this.weight,
       this.fontSize,
-      this.decoration});
+      this.decoration,
+      this.maxLine});
   final String text;
   final Color? color;
   final FontWeight? weight;
   final double? fontSize;
   final TextDecoration? decoration;
+  final int? maxLine;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class TextWithDmSans extends StatelessWidget {
           fontSize: fontSize,
           fontWeight: weight,
           decoration: decoration),
+      maxLines: maxLine,
     );
   }
 }
@@ -97,18 +100,60 @@ closeLoading() {
 }
 
 showWarning(String title, String msg) {
-  Get.snackbar(title, msg,
-      titleText: Row(
-        children: const [
-          Icon(
-            Icons.warning_rounded,
-            color: Colors.orange,
+  // Get.snackbar(title, msg,
+  //     duration: Duration(milliseconds: 1000),
+  //     titleText: Row(
+  //       children: const [
+  //         Icon(
+  //           Icons.warning_rounded,
+  //           color: Colors.blue,
+  //         ),
+  //       ],
+  //     ),
+  //     snackPosition: SnackPosition.BOTTOM,
+  //     backgroundColor: Colors.blue.shade50,
+  //     colorText: Colors.blue);
+  showModalBottomSheet(
+      context: Get.overlayContext!,
+      builder: (context) {
+        double h = MediaQuery.of(context).size.height;
+        double w = MediaQuery.of(context).size.width;
+        return Container(
+          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.2)),
+          height: h * .1,
+          width: w,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: w * .9,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: TextWithDmSans(
+                      text: msg,
+                      color: Color(0xFF2F80EC),
+                      maxLine: 3,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: w * .1,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: InkWell(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Icon(Icons.close)),
+                ),
+              )
+            ],
           ),
-        ],
-      ),
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.amber.shade50,
-      colorText: Colors.orange);
+        );
+      });
 }
 
 List<BoxShadow> getBoxShadow() {
