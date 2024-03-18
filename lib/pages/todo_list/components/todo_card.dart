@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:todo_app/constant.dart';
 import 'package:todo_app/utils.dart' as u;
 import '../todo_list_controller.dart';
-import 'todo_details_popup.dart';
 
 class TodoListContainer extends GetView<TodoListController> {
   const TodoListContainer({
@@ -19,51 +18,59 @@ class TodoListContainer extends GetView<TodoListController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Container(
+      height: h,
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(45), topLeft: Radius.circular(45))),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        padding: EdgeInsets.only(top: h * .03),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              u.vFill(h * .02),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  u.TextWithDmSans(
-                    text: "Calendar",
-                    fontSize: 18,
-                    color: violet,
-                  ),
-                  u.hFill(2),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    color: violet,
-                  )
-                ],
+              SizedBox(
+                height: controller.isCalendarOpened.value ? 60 : h * .07,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: controller.isCalendarOpened.value
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < 3; i++)
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          u.TextWithDmSans(
+                            text:
+                                i == 0 ? "All" : (i == 1 ? "Todo" : "Routine"),
+                            weight: FontWeight.w700,
+                            fontSize: 18,
+                            color: violet,
+                          ),
+                          // Text()
+                          Container(
+                            color: violet,
+                            height: 2,
+                            width: 30,
+                          )
+                        ],
+                      )
+                  ],
+                ),
               ),
-              u.vFill(h * .04),
-              u.TextWithDmSans(
-                text: "${u.getMonthName(today)} ${today.year}",
-                color: violet,
-                fontSize: 16,
-                weight: FontWeight.w600,
-              ),
-              u.TextWithDmSans(
-                  text: "${today.day} ${u.getWeekDay(today)}",
-                  color: violet,
-                  fontSize: 40,
-                  weight: FontWeight.w900),
-              u.vFill(h * .01),
-              Container(
-                  height: 2,
-                  width: w,
-                  color: const Color.fromARGB(255, 129, 114, 169)),
-              u.vFill(h * .02),
-              TodoListView(
-                controller: controller,
-                w: w,
-              ),
+              GetBuilder<TodoListController>(builder: (cont) {
+                return controller.isGettingTodos.value
+                    ? Center(
+                        child: CircularProgressIndicator(
+                        color: violet,
+                      ))
+                    : TodoList(
+                        controller: controller,
+                        w: w,
+                        h: h,
+                      );
+              }),
             ],
           ),
         ),
@@ -72,66 +79,79 @@ class TodoListContainer extends GetView<TodoListController> {
   }
 }
 
-class TodoListView extends StatelessWidget {
-  const TodoListView({
+class TodoList extends StatelessWidget {
+  const TodoList({
     super.key,
     required this.controller,
     required this.w,
+    required this.h,
   });
 
   final TodoListController controller;
   final double w;
+  final double h;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: controller.todoList.length,
-      itemBuilder: (BuildContext context, int index) {
-        return InkWell(
-          onTap: () => showTaskDetails(w, controller, index),
-          child: Container(
-            padding: const EdgeInsets.only(top: 25, bottom: 25, right: 20),
-            decoration: BoxDecoration(
-                border:
-                    Border(bottom: BorderSide(color: Colors.grey.shade200))),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 24.0,
-                  height: 24.0,
-                  child: Checkbox(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3)),
-                    activeColor: violet,
-                    checkColor: Colors.white,
-                    value: false,
-                    onChanged: (value) {},
-                  ),
+    return controller.todoList.isEmpty
+        ? SizedBox(
+            height: h * .5,
+            child: const Center(
+                child: u.TextWithDmSans(
+              text: "There are no Todos here",
+              fontSize: 17,
+              weight: FontWeight.w500,
+            )),
+          )
+        : ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.todoList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                margin:
+                    EdgeInsets.only(bottom: 5, left: w * .02, right: w * .02),
+                padding: const EdgeInsets.only(
+                    top: 20, bottom: 20, right: 20, left: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                u.hFill(10),
-                SizedBox(
-                  width: w * .6,
-                  child: u.TextWithDmSans(
-                    text: controller.todoList[index].title ?? "--",
-                    fontSize: 17,
-                    weight: FontWeight.w500,
-                    color: violet,
-                  ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 24.0,
+                      height: 24.0,
+                      child: Checkbox(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(3)),
+                        activeColor: violet,
+                        checkColor: Colors.white,
+                        value: controller.todoList[index].status ?? false,
+                        onChanged: (value) {
+                          controller.showConfirmStatus(
+                              controller.todoList[index], value!);
+                        },
+                      ),
+                    ),
+                    u.hFill(10),
+                    SizedBox(
+                      width: w * .76,
+                      child: u.TextWithDmSans(
+                        text: controller.todoList[index].title ?? "--",
+                        fontSize: 17,
+                        weight: FontWeight.w500,
+                        decoration: controller.todoList[index].status!
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        color: violet,
+                      ),
+                    ),
+                    const Spacer(),
+                  ],
                 ),
-                const Spacer(),
-                SizedBox(
-                  width: 24.0,
-                  child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.delete, color: Colors.red.shade400)),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
+              );
+            },
+          );
   }
 }

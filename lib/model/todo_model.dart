@@ -7,6 +7,7 @@ class TodoModel {
   String? dateTime;
   bool? priority;
   String? type;
+  bool? status;
 
   TodoModel(
       {this.id,
@@ -14,7 +15,8 @@ class TodoModel {
       this.description,
       this.dateTime,
       this.priority,
-      this.type});
+      this.type,
+      this.status});
 
   TodoModel.fromJson(Map<String, dynamic> json) {
     if (json["id"] is String) {
@@ -35,6 +37,9 @@ class TodoModel {
     if (json["type"] is String) {
       type = json["type"];
     }
+    if (json["status"] is String) {
+      status = json["status"];
+    }
   }
 
   factory TodoModel.fromSnapshot(
@@ -46,7 +51,8 @@ class TodoModel {
         description: data["description"],
         priority: data["priority"],
         title: data["title"],
-        type: data["type"]);
+        type: data["type"],
+        status: data["status"]);
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
@@ -56,6 +62,7 @@ class TodoModel {
     _data["dateTime"] = dateTime;
     _data["priority"] = priority;
     _data["type"] = type;
+    _data["status"] = status;
     return _data;
   }
 }

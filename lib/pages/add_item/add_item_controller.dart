@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:todo_app/firebase/firebase_database.dart';
 import 'package:todo_app/model/todo_model.dart';
 import 'package:todo_app/pages/add_item/widgets/success_popup.dart';
@@ -12,7 +14,8 @@ class AddItemController extends GetxController {
   var goingToMakePriority = false.obs;
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-
+  TextEditingController collbName = TextEditingController();
+  TextEditingController collabMail = TextEditingController();
   storeDataToDb() async {
     TodoModel todoData = TodoModel.fromJson({});
 
@@ -32,6 +35,7 @@ class AddItemController extends GetxController {
     todoData.dateTime = selectedDate.value.toString();
     todoData.priority = goingToMakePriority.value;
     todoData.id = uniqueId;
+    todoData.status = false;
     dynamic response = await FirebaseDatabase().storeData(todoData, uniqueId);
     if (response == null) {
       clearData();
@@ -59,5 +63,45 @@ class AddItemController extends GetxController {
     selectedDate.value = DateTime.now();
     titleController.clear();
     descriptionController.clear();
+  }
+
+  sendEmail() async {
+    try {
+      SmtpServer smtpServer =
+          gmail("taskcollaborative@gmail.com", "mjaz spug moui fcnf");
+      Message message = Message();
+      message.from = const Address("taskcollaborative@gmail.com");
+      // collab.789
+      message.recipients.add(collabMail);
+      message.text = "this is test message";
+      SendReport report = await send(message, smtpServer);
+      print(report);
+      clearCollabDetails();
+    } on Exception catch (_) {
+      print(_);
+      u.showWarning("Oops", "Could not send email");
+    }
+  }
+
+  storeCollabUser() {
+    Map<String, dynamic> collabData = {
+      "name": collbName.text,
+      "email": collabMail.text
+    };
+    FirebaseDatabase().storeCollaborator(
+      collabData,
+      collabData["email"],
+      onSuccess: () {
+        u.showWarning("Great", "Successfully add collaborator");
+      },
+      onError: (p0) {
+        u.showWarning("Failure", "Could not add collaborator");
+      },
+    );
+  }
+
+  clearCollabDetails() {
+    collbName.text = "";
+    collabMail.text = "";
   }
 }

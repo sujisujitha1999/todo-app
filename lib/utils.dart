@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:todo_app/constant.dart';
 
 Logger log = Logger();
 String getWeekDay(DateTime day) {
@@ -19,21 +20,30 @@ String getFullDate(DateTime day) {
 
 class TextWithDmSans extends StatelessWidget {
   const TextWithDmSans(
-      {super.key, required this.text, this.color, this.weight, this.fontSize});
+      {super.key,
+      required this.text,
+      this.color,
+      this.weight,
+      this.fontSize,
+      this.decoration,
+      this.maxLine});
   final String text;
   final Color? color;
   final FontWeight? weight;
   final double? fontSize;
+  final TextDecoration? decoration;
+  final int? maxLine;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       style: GoogleFonts.dmSans(
-        color: color,
-        fontSize: fontSize,
-        fontWeight: weight,
-      ),
+          color: color,
+          fontSize: fontSize,
+          fontWeight: weight,
+          decoration: decoration),
+      maxLines: maxLine,
     );
   }
 }
@@ -61,15 +71,14 @@ showLoading(message) {
       child: Center(
         child: SizedBox(
           width: 300,
-          // height: 100,
           child: Material(
             type: MaterialType.transparency,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CircularProgressIndicator(
+                CircularProgressIndicator(
                   strokeWidth: 5,
-                  // valueColor: AlwaysStoppedAnimation<Color>(),
+                  color: violet,
                 ),
                 vFill(10),
                 Text('$message...',
@@ -91,18 +100,60 @@ closeLoading() {
 }
 
 showWarning(String title, String msg) {
-  Get.snackbar(title, msg,
-      titleText: Row(
-        children: const [
-          Icon(
-            Icons.warning_rounded,
-            color: Colors.orange,
+  // Get.snackbar(title, msg,
+  //     duration: Duration(milliseconds: 1000),
+  //     titleText: Row(
+  //       children: const [
+  //         Icon(
+  //           Icons.warning_rounded,
+  //           color: Colors.blue,
+  //         ),
+  //       ],
+  //     ),
+  //     snackPosition: SnackPosition.BOTTOM,
+  //     backgroundColor: Colors.blue.shade50,
+  //     colorText: Colors.blue);
+  showModalBottomSheet(
+      context: Get.overlayContext!,
+      builder: (context) {
+        double h = MediaQuery.of(context).size.height;
+        double w = MediaQuery.of(context).size.width;
+        return Container(
+          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.2)),
+          height: h * .1,
+          width: w,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: w * .9,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: TextWithDmSans(
+                      text: msg,
+                      color: Color(0xFF2F80EC),
+                      maxLine: 3,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: w * .1,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: InkWell(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Icon(Icons.close)),
+                ),
+              )
+            ],
           ),
-        ],
-      ),
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.amber.shade50,
-      colorText: Colors.orange);
+        );
+      });
 }
 
 List<BoxShadow> getBoxShadow() {

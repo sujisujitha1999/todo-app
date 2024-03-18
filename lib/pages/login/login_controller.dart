@@ -15,40 +15,82 @@ class LoginController extends GetxController {
   validateEmailAndPassword() {
     if (emailController.text.isEmpty) {
       u.showWarning("Warning", "Please Enter email id");
-      return;
+      return true;
     } else if (passwordController.text.isEmpty) {
       u.showWarning("Warning", "Please Enter password");
+      return true;
     } else if (passwordController.text.length < 6) {
       u.showWarning("Warning", "Please give password Atleast 6 characters");
-      return;
+      return true;
+    } else {
+      return false;
     }
   }
 
   onLogin() {
+    if (validateEmailAndPassword()) {
+      return;
+    }
+
+    try {
+      FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text)
+          .then((user) {});
+    } on FirebaseAuthException catch (e) {
+      print(e);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  onLogout() {
+    clearCredentials();
+    FirebaseAuth.instance.signOut();
+  }
+
+  createNewUser() async {
     validateEmailAndPassword();
-    FirebaseAuthentication()
-        .createNewUser(emailController.text, passwordController.text)
-        .then((value) {
-      if (value == null) {
-        print("Logged in successfully.");
-        Get.offAll(() => HomeView());
-      } else {
-        print(value);
+    try {
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      )
+          .then((user) {
+        // if (user == null) {
+        //   Get.offAll(() => TodoListView());
+        // } else {}
+        print(user);
+      });
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
       }
-    });
+    } catch (e) {
+      print(e);
+    }
   }
 
   checkUserLoggedInOrNot() {
+    validateEmailAndPassword();
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user == null) {
-        Get.offAll(() => LoginView());
+        Get.offAll(() => const LoginView());
       } else {
         g.userMail = user.email!;
         final todoController = Get.find<TodoListController>();
         todoController.searchByToday();
         todoController.getTodos();
-        Get.offAll(() => HomeView());
+        Get.offAll(() => TodoListView());
       }
     });
+  }
+
+  clearCredentials() {
+    emailController.text = "";
+    passwordController.text = "";
   }
 }
