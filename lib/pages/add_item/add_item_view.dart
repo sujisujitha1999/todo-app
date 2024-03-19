@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:todo_app/constant.dart';
 import 'package:todo_app/pages/add_item/add_item_controller.dart';
 import 'package:todo_app/utils.dart' as u;
@@ -172,96 +173,40 @@ class AddItemScreen extends GetView<AddItemController> {
                     g.collabUsers.isEmpty
                         ? const u.TextWithDmSans(
                             text: "There is no collabers added yet")
-                        : DropdownButton(
-                            value: "prathi",
-                            items: g.collabUsers
-                                .map((e) => DropdownMenuItem(
-                                    value: e,
-                                    child: u.TextWithDmSans(
-                                      text: e,
-                                    )))
-                                .toList(),
-                            onChanged: (value) {},
+                        : SizedBox(
+                            width: w * .45,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: DropdownButton(
+                                isExpanded: true,
+                                items: controller.getDropdownMenuItems(),
+                                onChanged: (value) {
+                                  print(value);
+                                  print(jsonDecode(value.toString()));
+                                  controller.selectedCollabs
+                                      .add(jsonDecode(value.toString()));
+                                },
+                              ),
+                            ),
                           ),
                     IconButton(
                         onPressed: () {
-                          Get.defaultDialog(
-                              title: "Add collabrator",
-                              content: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    u.TextWithDmSans(
-                                      text: "Name",
-                                      weight: FontWeight.w500,
-                                    ),
-                                    u.vFill(10),
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                          hintText: "Collaborator Name",
-                                          hintStyle:
-                                              GoogleFonts.dmSans(fontSize: 12),
-                                          prefixIcon: Icon(
-                                            Icons.person,
-                                            color: violet,
-                                          ),
-                                          enabledBorder: UnderlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: violet)),
-                                          focusedBorder: UnderlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: violet))),
-                                    ),
-                                    u.vFill(20),
-                                    u.TextWithDmSans(
-                                      text: "Email",
-                                      weight: FontWeight.w500,
-                                    ),
-                                    u.vFill(10),
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                          hintText: "Collaborator Email",
-                                          hintStyle:
-                                              GoogleFonts.dmSans(fontSize: 12),
-                                          prefixIcon: Icon(
-                                            Icons.mail_rounded,
-                                            color: violet,
-                                          ),
-                                          enabledBorder: UnderlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: violet)),
-                                          focusedBorder: UnderlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: violet))),
-                                    ),
-                                    u.vFill(20),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                SizedBox(
-                                  width: w * .3,
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.green),
-                                      onPressed: () {
-                                        // controller.sendEmail();
-                                      },
-                                      child: u.TextWithDmSans(
-                                        text: "Add",
-                                        weight: FontWeight.w500,
-                                      )),
-                                )
-                              ]);
+                          controller.showDialogForAddCollaborator(w);
                         },
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.add_circle_rounded,
                           color: Colors.green,
                           size: 40,
                         ))
                   ],
                 ),
+                u.vFill(h * .02),
+
+                if (controller.selectedCollabs.isNotEmpty)
+                  getHeading("This task also visible for"),
+                if (controller.selectedCollabs.isNotEmpty)
+                  for (Map element in controller.selectedCollabs)
+                    u.TextWithDmSans(text: element["name"]),
                 u.vFill(h * .02),
                 getHeading("Priority"),
                 Row(

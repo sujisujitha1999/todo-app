@@ -1,14 +1,18 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:todo_app/firebase/firebase_database.dart';
 import 'package:todo_app/model/todo_model.dart';
-import 'package:todo_app/pages/add_item/widgets/success_popup.dart';
 import 'package:todo_app/pages/todo_list/todo_list_controller.dart';
 import 'package:todo_app/utils.dart' as u;
+import 'package:todo_app/globals.dart' as g;
+import '../../constant.dart';
 
 class AddItemController extends GetxController {
+  var selectedCollabs = [].obs;
   var isSelectedTodo = true.obs;
   var selectedDate = DateTime.now().obs;
   var goingToMakePriority = false.obs;
@@ -36,14 +40,103 @@ class AddItemController extends GetxController {
     todoData.priority = goingToMakePriority.value;
     todoData.id = uniqueId;
     todoData.status = false;
-    dynamic response = await FirebaseDatabase().storeData(todoData, uniqueId);
-    if (response == null) {
-      clearData();
+    FirebaseDatabase().storeData(
+      g.userMail,
+      todoData,
+      uniqueId,
+      onSuccess: (data) {
+        clearData();
+        clearCollabDetails();
+        Get.find<TodoListController>().searchByToday();
+        Get.find<TodoListController>().getTodos();
+        Get.back();
+        u.showWarning("", data);
+      },
+      onErrror: (fail) {
+        u.showWarning("", fail);
+      },
+    );
+  }
 
-      Get.find<TodoListController>().searchByToday();
-      Get.find<TodoListController>().getTodos();
-      showSuccessPopup();
-    }
+  showDialogForAddCollaborator(double w) {
+    return Get.defaultDialog(
+        title: "Add collabrator",
+        content: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Obx(
+              () => isStoringCollab.value
+                  ? const CircularProgressIndicator()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const u.TextWithDmSans(
+                          text: "Name",
+                          weight: FontWeight.w500,
+                        ),
+                        u.vFill(10),
+                        TextFormField(
+                          controller: collbName,
+                          decoration: InputDecoration(
+                              hintText: "Collaborator Name",
+                              hintStyle: GoogleFonts.dmSans(fontSize: 12),
+                              prefixIcon: Icon(
+                                Icons.person,
+                                color: violet,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet)),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet))),
+                        ),
+                        u.vFill(20),
+                        const u.TextWithDmSans(
+                          text: "Email",
+                          weight: FontWeight.w500,
+                        ),
+                        u.vFill(10),
+                        TextFormField(
+                          controller: collabMail,
+                          decoration: InputDecoration(
+                              hintText: "Collaborator Email",
+                              hintStyle: GoogleFonts.dmSans(fontSize: 12),
+                              prefixIcon: Icon(
+                                Icons.mail_rounded,
+                                color: violet,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet)),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet))),
+                        ),
+                        u.vFill(20),
+                      ],
+                    ),
+            )),
+        actions: [
+          SizedBox(
+            width: w * .3,
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () {
+                  if (collbName.text.isEmpty || collabMail.text.isEmpty) {
+                    u.showWarning("Invalid",
+                        "Please give name as well as email of collborator");
+                  } else if (g.userMail == collabMail.text) {
+                    u.showWarning("Invalid",
+                        "You cannot add yourself as collaborator. Make sure given email is not yours.");
+                  } else if (checkCollabIsAlreadyAddedOrNot()) {
+                    u.showWarning(
+                        "", "This email already added as your collborator");
+                  } else {
+                    storeCollabUser();
+                  }
+                },
+                child: const u.TextWithDmSans(
+                  text: "Add",
+                  weight: FontWeight.w500,
+                )),
+          )
+        ]);
   }
 
   validate() {
@@ -75,26 +168,34 @@ class AddItemController extends GetxController {
       message.recipients.add(collabMail);
       message.text = "this is test message";
       SendReport report = await send(message, smtpServer);
-      print(report);
+
       clearCollabDetails();
     } on Exception catch (_) {
-      print(_);
       u.showWarning("Oops", "Could not send email");
     }
   }
 
+  var isStoringCollab = false.obs;
   storeCollabUser() {
-    Map<String, dynamic> collabData = {
+    isStoringCollab.value = true;
+    Map<String, String> collabData = {
       "name": collbName.text,
       "email": collabMail.text
     };
     FirebaseDatabase().storeCollaborator(
-      collabData,
-      collabData["email"],
+      g.makeCollabPayloadGetRead(collabData),
+      collabData["email"]!,
       onSuccess: () {
-        u.showWarning("Great", "Successfully add collaborator");
+        isStoringCollab.value = false;
+        Get.back();
+
+        u.showWarning("Great!..",
+            "Successfully added ${collbName.text} as your collaborator");
+        clearCollabDetails();
       },
       onError: (p0) {
+        isStoringCollab.value = false;
+        Get.back();
         u.showWarning("Failure", "Could not add collaborator");
       },
     );
@@ -103,5 +204,26 @@ class AddItemController extends GetxController {
   clearCollabDetails() {
     collbName.text = "";
     collabMail.text = "";
+  }
+
+  checkCollabIsAlreadyAddedOrNot() {
+    for (Map element in g.collabUsers) {
+      if (element["email"] == collabMail.text) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getDropdownMenuItems() {
+    List<DropdownMenuItem<Object>> menus = [];
+    for (Map element in g.collabUsers) {
+      menus.add(DropdownMenuItem(
+          value: jsonEncode(element),
+          child: u.TextWithDmSans(
+            text: element["name"],
+          )));
+    }
+    return menus;
   }
 }

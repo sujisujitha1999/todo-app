@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:todo_app/firebase/firebase_authentication.dart';
+import 'package:todo_app/firebase/firebase_database.dart';
 import 'package:todo_app/pages/login/login_view.dart';
 import 'package:todo_app/pages/todo_list/todo_list_controller.dart';
 import 'package:todo_app/pages/todo_list/todo_list_view.dart';
 import 'package:todo_app/utils.dart' as u;
 import 'package:todo_app/globals.dart' as g;
+import 'package:todo_app/constant.dart' as c;
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -81,6 +82,14 @@ class LoginController extends GetxController {
         Get.offAll(() => const LoginView());
       } else {
         g.userMail = user.email!;
+        FirebaseDatabase().getAllCollaborators(
+          onSuccess: (data) {
+            g.collabUsers = data.get(c.Constants.kListOfCollab);
+          },
+          onError: (err) {
+            print("get error ${err}");
+          },
+        );
         final todoController = Get.find<TodoListController>();
         todoController.searchByToday();
         todoController.getTodos();

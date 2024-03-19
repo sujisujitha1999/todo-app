@@ -23,16 +23,17 @@ class FirebaseDatabase {
         .toList();
   }
 
-  Future storeData(TodoModel data, String id) async {
+  void storeData(String collecID, TodoModel data, String docId,
+      {Function(String fail)? onErrror,
+      Function(String data)? onSuccess}) async {
     await database
-        .collection(g.userMail)
-        .doc(id)
+        .collection(collecID)
+        .doc(docId)
         .set(data.toJson())
         .whenComplete(() {
-      return null;
+      onSuccess!("Successfully added your task!.");
     }).catchError((error, sta) {
-      u.showWarning("Error", "Something went wrong. Try again later.");
-      return error;
+      onErrror!("Could not add task. Try again later.");
     });
   }
 
@@ -54,14 +55,25 @@ class FirebaseDatabase {
   storeCollaborator(Map<String, dynamic> data, String collaboratorEmail,
       {Function()? onSuccess, Function(dynamic)? onError}) async {
     await database
-        .collection(g.userMail)
-        .doc(collaboratorEmail)
+        .collection("collaborators")
+        .doc(g.userMail)
         .set(data)
         .whenComplete(() {
       onSuccess!();
     }).catchError((error, _) {
       u.showWarning("Error", "Something went wrong. Try again later.");
       onError!(error);
+    });
+  }
+
+  getAllCollaborators(
+      {Function(DocumentSnapshot data)? onSuccess,
+      Function(dynamic err)? onError}) {
+    database.collection("collaborators").doc(g.userMail).get().then((val) {
+      print(val);
+      onSuccess!(val);
+    }).catchError((err, _) {
+      onError!(err);
     });
   }
 }
